@@ -20,6 +20,20 @@ const User = {
       callback(null, results[0]);
     });
   },
+  findByEmail: (email, callback) => {
+    const query = 'SELECT * FROM users WHERE email = ?';
+    connection.execute(query, [email], (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results[0]);
+    });
+  },
+  findById: (id, callback) => {
+    const query = 'SELECT * FROM users WHERE id = ?';
+    connection.execute(query, [id], (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results[0]);
+    });
+  },
   // Add more methods as needed
 };
 

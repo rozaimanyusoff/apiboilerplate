@@ -1,4 +1,3 @@
-// filepath: src/controllers/userController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
@@ -6,11 +5,23 @@ const config = require('../../config');
 
 const register = (req, res) => {
   const { username, email, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 8);
 
-  User.create({ username, email, password: hashedPassword }, (err, result) => {
-    if (err) return res.status(500).send('Error registering user');
-    res.status(201).send('User registered successfully');
+  // Check if the username or email already exists
+  User.findByUsername(username, (err, existingUser) => {
+    if (err) return res.status(500).send('Error checking username');
+    if (existingUser) return res.status(400).send('Username already exists');
+
+    User.findByEmail(email, (err, existingEmail) => {
+      if (err) return res.status(500).send('Error checking email');
+      if (existingEmail) return res.status(400).send('Email already exists');
+
+      const hashedPassword = bcrypt.hashSync(password, 8);
+
+      User.create({ username, email, password: hashedPassword }, (err, result) => {
+        if (err) return res.status(500).send('Error registering user');
+        res.status(201).send('User registered successfully');
+      });
+    });
   });
 };
 
